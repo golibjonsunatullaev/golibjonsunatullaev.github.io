@@ -3,7 +3,21 @@ const navLinks = document.querySelector(".nav-links");
 const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
 const themeSwitch = document.querySelector(".theme-switch");
 const root = document.documentElement;
-const favicon = document.getElementById("favicon");
+
+function updateFavicon(theme) {
+  if (typeof window.updateThemeFavicon === "function") {
+    window.updateThemeFavicon(theme);
+    return;
+  }
+
+  const icon = document.getElementById("favicon");
+  if (!icon || !icon.parentNode) return;
+
+  const href = theme === "dark" ? "favicon.ico" : "favicon2.ico";
+  const nextIcon = icon.cloneNode(false);
+  nextIcon.setAttribute("href", `${href}?theme=${theme}`);
+  icon.parentNode.replaceChild(nextIcon, icon);
+}
 
 function getTheme() {
   return root.getAttribute("data-theme") === "dark" ? "dark" : "light";
@@ -12,9 +26,7 @@ function getTheme() {
 function setTheme(theme) {
   root.setAttribute("data-theme", theme);
   localStorage.setItem("theme", theme);
-  if (favicon) {
-    favicon.setAttribute("href", theme === "dark" ? "favicon.ico" : "favicon2.ico");
-  }
+  updateFavicon(theme);
   if (themeSwitch) {
     const isDark = theme === "dark";
     const label = isDark ? "Switch to light mode" : "Switch to dark mode";

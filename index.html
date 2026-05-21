@@ -11,14 +11,31 @@
   <link rel="stylesheet" href="style.css">
   <script>
     (function () {
+      function updateFavicon(theme) {
+        var href = theme === "dark" ? "favicon.ico" : "favicon2.ico";
+        var icon = document.getElementById("favicon");
+        if (icon && icon.parentNode) {
+          var nextIcon = icon.cloneNode(false);
+          nextIcon.setAttribute("href", href + "?theme=" + theme);
+          icon.parentNode.replaceChild(nextIcon, icon);
+        }
+
+        var shortcutIcon = document.getElementById("favicon-shortcut");
+        if (!shortcutIcon) {
+          shortcutIcon = document.createElement("link");
+          shortcutIcon.setAttribute("id", "favicon-shortcut");
+          shortcutIcon.setAttribute("rel", "shortcut icon");
+          document.head.appendChild(shortcutIcon);
+        }
+        shortcutIcon.setAttribute("href", href + "?theme=" + theme);
+      }
+
       var stored = localStorage.getItem("theme");
       var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       var theme = stored || (prefersDark ? "dark" : "light");
       document.documentElement.setAttribute("data-theme", theme);
-      var favicon = document.getElementById("favicon");
-      if (favicon) {
-        favicon.setAttribute("href", theme === "dark" ? "favicon.ico" : "favicon2.ico");
-      }
+      updateFavicon(theme);
+      window.updateThemeFavicon = updateFavicon;
     })();
   </script>
 </head>
