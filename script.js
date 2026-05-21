@@ -1,6 +1,7 @@
 const menuToggle = document.querySelector(".menu-toggle");
 const navLinks = document.querySelector(".nav-links");
 const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
+const copyLinks = document.querySelectorAll(".contact-link[data-copy]");
 const themeSwitch = document.querySelector(".theme-switch");
 const root = document.documentElement;
 
@@ -42,6 +43,52 @@ if (themeSwitch) {
   });
   setTheme(getTheme());
 }
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const helper = document.createElement("textarea");
+  helper.value = text;
+  helper.setAttribute("readonly", "");
+  helper.style.position = "absolute";
+  helper.style.left = "-9999px";
+  document.body.appendChild(helper);
+  helper.select();
+  document.execCommand("copy");
+  document.body.removeChild(helper);
+}
+
+copyLinks.forEach((link) => {
+  let resetTimer;
+
+  link.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    const text = link.getAttribute("data-copy");
+    const label = link.getAttribute("data-copy-label") || text;
+    const textNode = link.querySelector(".contact-text");
+
+    if (!text || !textNode) return;
+
+    try {
+      await copyText(text);
+      textNode.textContent = "Copied";
+      clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        textNode.textContent = label;
+      }, 1600);
+    } catch (error) {
+      textNode.textContent = "Copy failed";
+      clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        textNode.textContent = label;
+      }, 1600);
+    }
+  });
+});
 
 const MOBILE_NAV_QUERY = "(max-width: 768px)";
 
